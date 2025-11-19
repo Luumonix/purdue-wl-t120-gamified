@@ -28,22 +28,20 @@ const api = axios.create({
   },
 });
 
-// Set baseURL dynamically for each request
+// Single interceptor to set both baseURL and token
 api.interceptors.request.use((config) => {
   // Set the baseURL at request time
   if (!config.baseURL) {
     config.baseURL = getApiUrl();
     console.log('[API] Request using baseURL:', config.baseURL);
   }
-  return config;
-});
-
-// Add token to requests if available
-api.interceptors.request.use((config) => {
+  
+  // Add token if available
   const token = localStorage.getItem('token');
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
+  
   return config;
 });
 
