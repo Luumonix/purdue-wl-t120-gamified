@@ -1,10 +1,9 @@
 import axios from 'axios';
 
-// Dynamically determine API URL based on current environment
+// Dynamically determine API URL at request time
 const getApiUrl = () => {
   // If NEXT_PUBLIC_API_URL is set, use it
   if (process.env.NEXT_PUBLIC_API_URL) {
-    console.log('[API] Using NEXT_PUBLIC_API_URL:', process.env.NEXT_PUBLIC_API_URL);
     return process.env.NEXT_PUBLIC_API_URL;
   }
   
@@ -13,29 +12,30 @@ const getApiUrl = () => {
     const protocol = window.location.protocol;
     const hostname = window.location.hostname;
     
-    console.log('[API] Browser detected - protocol:', protocol, 'hostname:', hostname);
-    
-    // If on production domain, use production API
+    // If on production domain, use production API with same protocol
     if (hostname === 'purdue-tech120-dev.ishmeet.net') {
-      const apiUrl = `${protocol}//api.purdue-tech120-dev.ishmeet.net`;
-      console.log('[API] Using production API:', apiUrl);
-      return apiUrl;
+      return `${protocol}//api.purdue-tech120-dev.ishmeet.net`;
     }
   }
   
   // Default to localhost
-  console.log('[API] Using default localhost');
   return 'http://localhost:8000';
 };
 
-const API_URL = getApiUrl();
-console.log('[API] Final API_URL:', API_URL);
-
 const api = axios.create({
-  baseURL: API_URL,
   headers: {
     'Content-Type': 'application/json',
   },
+});
+
+// Set baseURL dynamically for each request
+api.interceptors.request.use((config) => {
+  // Set the baseURL at request time
+  if (!config.baseURL) {
+    config.baseURL = getApiUrl();
+    console.log('[API] Request using baseURL:', config.baseURL);
+  }
+  return config;
 });
 
 // Add token to requests if available
