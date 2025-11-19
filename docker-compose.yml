@@ -43,7 +43,7 @@ services:
       dockerfile: Dockerfile
     container_name: cyberguard-frontend
     environment:
-      NEXT_PUBLIC_API_URL: http://localhost:8000
+      NEXT_PUBLIC_API_URL: https://api.purdue-tech120-dev.ishmeet.net
     ports:
       - "3000:3000"
     depends_on:
